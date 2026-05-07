@@ -51,5 +51,4 @@ streamlit run app.py
 - `config.py`: Centralized configuration and environment loading.
 - `utils.py`: Utility functions (JSON parsing and text cleaning).
 
-## 🛡️ License
-Distributed under the MIT License. See `LICENSE` for more information.
+
