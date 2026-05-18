@@ -15,17 +15,21 @@ def summarize_email(email_content):
     warning_message = None
     
     # 1. Cleaning & Initial Validation
-    cleaned_content = clean_text(email_content)
+    cleaned_content, html_detected = clean_text(email_content)
     
     if not cleaned_content:
         return None, None, "Please paste an email body first.", None
     
     if len(cleaned_content) < config.MIN_CHARS:
-        return None, None, f"The email text is too short (min {config.MIN_CHARS} chars).", None
+        return None, None, None, "The email text is too short to summarize."
+
+    if html_detected:
+        warning_message = "HTML-like content was detected. Some formatting may be simplified."
 
     if len(cleaned_content) > config.MAX_CHARS:
         cleaned_content = cleaned_content[:config.MAX_CHARS]
-        warning_message = f"Email truncated to {config.MAX_CHARS} characters for free-tier compatibility."
+        truncation_msg = f"Email truncated to {config.MAX_CHARS} characters for free-tier compatibility."
+        warning_message = f"{warning_message} | {truncation_msg}" if warning_message else truncation_msg
 
     # 2. Mock Mode Support
     if config.MOCK_MODE:

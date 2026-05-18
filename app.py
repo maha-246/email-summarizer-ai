@@ -1,6 +1,6 @@
 import streamlit as st
 import config
-from backend import process_email
+from src.summarizer import summarize_email
 
 # 1. UI Page Setup
 st.set_page_config(page_title="Email Summary Assistant", page_icon="📧")
@@ -23,43 +23,40 @@ with st.form("summary_form"):
 
 # 3. Execution
 if submit_button:
-    if not config.GEMINI_API_KEY:
-        st.error("Missing GEMINI_API_KEY. Please check your .env file.")
-    else:
-        with st.spinner("AI is thinking..."):
-            # Notice how much cleaner this call is now!
-            data, provider, error, warning = process_email(email_content)
+    with st.spinner("AI is thinking..."):
+        # Refactored to use the new modular pipeline
+        data, provider, error, warning = summarize_email(email_content)
 
-        # Show Warnings/Errors
-        if warning:
-            st.warning(warning)
-            
-        if error:
-            st.error(error)
-        elif data:
-            st.subheader(f"Summary ({provider})")
-            
-            # Provider info
-            if provider == "Groq":
-                st.info("Generated using Groq fallback.")
-            else:
-                st.info("Generated using Gemini.")
+    # Show Warnings/Errors
+    if warning:
+        st.warning(warning)
+        
+    if error:
+        st.error(error)
+    elif data:
+        st.subheader(f"Summary ({provider})")
+        
+        # Provider info
+        if provider == "Groq":
+            st.info("Generated using Groq fallback.")
+        else:
+            st.info("Generated using Gemini.")
 
-            # Display Fields
-            st.write(f"**Summary:** {data.get('summary')}")
-            st.write(f"**Priority:** {data.get('priority', 'medium').upper()}")
+        # Display Fields
+        st.write(f"**Summary:** {data.get('summary')}")
+        st.write(f"**Priority:** {data.get('priority', 'medium').upper()}")
+        
+        st.write("**Important Details:**")
+        for detail in data.get('important_details', []):
+            st.write(f"- {detail}")
+        
+        st.write(f"**Action:** {data.get('required_action')}")
+        st.write(f"**Deadline:** {data.get('deadline') or 'None'}")
+        
+        if data.get('sensitive_info_detected'):
+            st.error("🚩 Sensitive information detected.")
+        
+        with st.expander("✨ View Suggested Reply"):
+            st.write(data.get('suggested_reply'))
             
-            st.write("**Important Details:**")
-            for detail in data.get('important_details', []):
-                st.write(f"- {detail}")
-            
-            st.write(f"**Action:** {data.get('required_action')}")
-            st.write(f"**Deadline:** {data.get('deadline') or 'None'}")
-            
-            if data.get('sensitive_info_detected'):
-                st.error("🚩 Sensitive information detected.")
-            
-            with st.expander("✨ View Suggested Reply"):
-                st.write(data.get('suggested_reply'))
-                
-            st.success("Finished!")
+        st.success("Finished!")

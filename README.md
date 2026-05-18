@@ -45,10 +45,19 @@ streamlit run app.py
 
 ## 📁 Project Structure
 
-- `app.py`: The Streamlit Frontend (UI and display logic).
-- `backend.py`: The Core Logic (AI workflow, validation, and fallback management).
-- `prompts.py`: The Prompt Engineering (AI system instructions).
-- `config.py`: Centralized configuration and environment loading.
-- `utils.py`: Utility functions (JSON parsing and text cleaning).
+- `app.py`: Streamlit entry point (UI logic only).
+- `config.py`: Root-level configuration and environment management.
+- `.env`: Private environment variables (not tracked).
+- `.env.example`: Template for environment variables.
+- `src/`: Core logic package.
+    - `summarizer.py`: Orchestrates the summarization pipeline.
+    - `llm_client.py`: Handles Gemini and Groq API interactions.
+    - `prompts.py`: AI system instructions and prompt templates.
+    - `cleaner.py`: Text normalization and cleaning.
+    - `validator.py`: JSON parsing and field validation.
+    - `logger.py`: Safe, centralized logging.
+    - `redactor.py`: (Placeholder) Sensitive info redaction.
+    - `parser.py`: (Placeholder) File parsing logic.
+    - `chunker.py`: (Placeholder) Text chunking logic.
 
 
